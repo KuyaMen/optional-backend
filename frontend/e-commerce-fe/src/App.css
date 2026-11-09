@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #f1f2f5;
+  background: #fffcfc;
+  background-image: url('https://i.pinimg.com/1200x/35/13/e2/3513e24c4088328fd97d52a4ff5a1713.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+.page {
+  min-height: 100vh;
+}
+
+.site-header {
+  padding: 42px 20px;
+  text-align: center;
+  color: rgb(255, 255, 255);
+  background-image: linear-gradient(
+      rgba(0, 0, 0, 0.4), 
+      rgba(0, 0, 0, 0.4)
+    ), 
+    url('https://i.pinimg.com/736x/61/2d/b2/612db2b914c347662eb709f3659a35e3.jpg');
+  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.eyebrow {
+  margin: 0 ;
+  font-size: 0.78rem;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  color:rgb(255, 255, 255)
+}
+
+.site-header h1 {
+  margin: 0 0 10px;
+  font-size: rem;
+  font-family: 'Poppins', sans-serif;
+  color: whitesmoke;
+}
+
+.site-header p:last-child {
+  margin-bottom: 0;
+  margin: 0 ;
+  color: #f3f5f2;
+  font-family: 'Poppins', sans-serif;
+}
+
+.product-section {
+  width: min(1100px, calc(100% - 32px));
+  margin: 32px auto; 
+}
+
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: whitesmoke;
+}
+
+.section-heading p {
+  color: #edeff1;
+  font-size: 0.9rem;
+}
+
+.product-grid {
+  display: flex;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.product-card {
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  
+  box-shadow: 0 5px 18px rgba(20, 40, 80, 0.08);
+}
+
+.product-image {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  background: #e8edf4;
+}
+
+.product-details {
+  padding: 18px;
+}
+
+.product-details h3 {
+  margin: 0 0 10px;
+  color:(212, 175, 55)
+}
+
+.description {
+  min-height: 54px;
+  color: (181, 101, 29);
+  line-height: 1.5;
+}
+
+.price {
+  margin: 16px 0;
+  color: orange;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.product-details button {
+  width: 100%;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  background: #705e0a;
+  cursor: pointer;
+}
+
+.product-details button:hover {
+  background: #1f6d10;
+}
+
+.product-details button:focus-visible {
+  outline: 3px solid #f4b942;
+  outline-offset: 3px;
+}
+
+.site-footer {
+  padding: 20px;
+  text-align: center;
+  color: #dfe3e9;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+}
