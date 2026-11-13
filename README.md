@@ -1,58 +1,100 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# OPTIONAL Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+OPTIONAL Backend is a Laravel REST API for the OPTIONAL product catalog. It provides authentication, product management, and admin-protected routes for the platform.
 
-## About Laravel
+## Project and group
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Frontend repository: [KuyaMen/optional-frontend](https://github.com/KuyaMen/optional-frontend)
+- Backend repository: [KuyaMen/optional-backend](https://github.com/KuyaMen/optional-backend)
+- Group name: OPTIONAL
+- Members:
+  - Kristian Jay Eugenio — [@KuyaMen](https://github.com/KuyaMen)
+  - Jave Balbuena — [@jebzkybalbuena-debug](https://github.com/jebzkybalbuena-debug)
+  - Grezz Quivon Mahinay — [@grasyaa](https://github.com/grezzxso)
+  - Eula Jane Justiniane — [@eulzjustin](https://github.com/eulzjustin)
+  - Cristine Pagobo — [@cristinayy](https://github.com/cristinayy)
+  - Glicerio Lamento — [@Glicerio2000](https://github.com/Glicerio2000)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Prerequisites and installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Requirements:
 
-## Learning Laravel
+- PHP 8.3+
+- Composer
+- SQLite or another configured Laravel database
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Steps:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Install PHP dependencies with `composer install`.
+2. Copy `.env.example` to `.env` and run `php artisan key:generate`.
+3. For SQLite, create `database/database.sqlite` if it does not exist.
+4. Configure the database in `.env`.
+5. Run migrations and product seed data with `php artisan migrate --seed`.
+6. Start the backend with `php artisan serve`.
+7. To provision an administrator, set `ADMIN_FIRSTNAME`, `ADMIN_LASTNAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `.env`, then run `php artisan db:seed --class=AdminUserSeeder`.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Never commit `.env` or publish administrator credentials. Public registration creates regular users and rejects role or permission fields.
 
-## Agentic Development
+## Configuring environment variables
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- Copy `.env.example` to `.env` before running the project.
+- Never commit `.env` files or publish real credentials.
+- Configure your local database and Laravel app settings in `.env`.
+- Public registration creates regular users and rejects role or permission fields.
+
+## Running the frontend and backend locally
+
+Backend:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Frontend:
 
-## Contributing
+```bash
+cd ../optional-frontend
+npm install
+npm run dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Authentication endpoints and product API routes
 
-## Code of Conduct
+The API uses Laravel Sanctum bearer tokens.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Request | Access |
+| --- | --- |
+| `POST /api/register` | Public |
+| `POST /api/login` | Public |
+| `POST /api/logout` | Authenticated |
+| `GET /api/products` | Authenticated users and admins |
+| `GET /api/products/{id}` | Authenticated users and admins |
+| `POST /api/products` | Admin only |
+| `PUT /api/products/{id}` | Admin only |
+| `PATCH /api/products/{id}` | Admin only |
+| `DELETE /api/products/{id}` | Admin only |
 
-## Security Vulnerabilities
+Guests receive `401 Unauthorized`; signed-in users attempting admin actions receive `403 Forbidden`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Role and permission rules
 
-## License
+- Public registration creates regular users only.
+- Role and permission fields are rejected during registration.
+- Only trusted operators can create administrator accounts with `AdminUserSeeder`.
+- The backend enforces these rules independently of frontend controls.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Known limitations
+
+- Password reset and email verification are not implemented.
+- Administrator accounts must be provisioned by a trusted operator with `AdminUserSeeder`.
+- The frontend and backend are maintained in separate repositories.
+
+## Verification
+
+Run the test suite with:
+
+```bash
+php artisan test
+```
+
+The project uses an in-memory SQLite database and a test-only encryption key configured in `phpunit.xml`.
