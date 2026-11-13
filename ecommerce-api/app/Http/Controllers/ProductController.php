@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
@@ -22,7 +23,7 @@ class ProductController extends Controller
         return new ProductResource($product->load(['category', 'productPhotos']));
     }
 
-    public function store(Request $request): ProductResource
+    public function store(Request $request): JsonResponse|ProductResource
     {
         if ($request->user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
@@ -49,7 +50,7 @@ class ProductController extends Controller
         return new ProductResource($product->load(['category', 'productPhotos']));
     }
 
-    public function update(Request $request, string $id): ProductResource
+    public function update(Request $request, string $id): JsonResponse|ProductResource
     {
         if ($request->user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);

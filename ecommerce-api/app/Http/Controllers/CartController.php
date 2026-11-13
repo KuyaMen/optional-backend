@@ -2,74 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Cart;
 use App\Http\Resources\CartResource;
+use App\Models\Product;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         return CartResource::collection(
-            Cart::where('user_id', $request->user()->id)->get()
+            $request->user()->carts()->with(['product.category', 'product.productPhotos'])->get()
         );
     }
 
-    public function store(Request $request)
+    public function store(Request $request): CartResource
     {
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'product_id' => ['required', 'exists:products,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
-        $validated['user_id'] = $request->user()->id;
+        $product = Product::findOrFail($validated['product_id']);
+        $cart = $request->user()->carts()->where('product_id', $product->id)->first();
+        $quantity = ($cart?->quantity ?? 0) + $validated['quantity'];
 
-        $cart = Cart::create($validated);
+        if ($quantity > $product->stock) {
+            throw ValidationException::withMessages([
+                'quantity' => ['The requested quantity exceeds the available stock.'],
+            ]);
+        }
+
+        if ($cart) {
+            $cart->increment('quantity', $validated['quantity']);
+        } else {
+            $cart = $request->user()->carts()->create([
+                'product_id' => $product->id,
+                'quantity' => $validated['quantity'],
+            ]);
+        }
+
+        return new CartResource($cart->load(['product.category', 'product.productPhotos']));
+    }
+
+    public function show(Request $request, string $id): CartResource
+    {
+        $cart = $request->user()->carts()
+            ->with(['product.category', 'product.productPhotos'])
+            ->findOrFail($id);
 
         return new CartResource($cart);
     }
 
-    public function show(Request $request, string $id)
+    public function update(Request $request, string $id): CartResource
     {
-        $cart = Cart::findOrFail($id);
-
-        if ($cart->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized.'], 403);
-        }
-
-        return new CartResource($cart);
-    }
-
-    public function update(Request $request, string $id)
-    {
-        $cart = Cart::findOrFail($id);
-    
-        if ($cart->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized.'], 403);
-        }
-
+        $cart = $request->user()->carts()->with('product')->findOrFail($id);
         $validated = $request->validate([
-            'product_id' => 'sometimes|required|exists:products,id',
-            'quantity' => 'sometimes|required|integer|min:1',
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
+
+        if ($validated['quantity'] > $cart->product->stock) {
+            throw ValidationException::withMessages([
+                'quantity' => ['The requested quantity exceeds the available stock.'],
+            ]);
+        }
 
         $cart->update($validated);
 
-        return new CartResource($cart);
+        return new CartResource($cart->load(['product.category', 'product.productPhotos']));
     }
 
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request, string $id): JsonResponse
     {
-        $cart = Cart::findOrFail($id);
-
-        if ($cart->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized.'], 403);
-        }
-
-        $cart->delete();
+        $request->user()->carts()->findOrFail($id)->delete();
 
         return response()->json([
-            'message' => 'Cart item deleted successfully'
+            'message' => 'Cart item deleted successfully',
         ]);
     }
 }

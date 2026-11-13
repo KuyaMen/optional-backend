@@ -1,17 +1,17 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderProductController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductPhotoController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\ProductPhotoController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\OrderProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,30 +25,30 @@ use App\Http\Controllers\OrderProductController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Public Product & Category viewing
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{product}', [ProductController::class, 'show']);
+// Public Category viewing
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
-
 
 // ==========================================
 // 2. PRIVATE ROUTES (Requires Sanctum Token)
 // ==========================================
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Auth & User
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return $request->user();
-    }); 
+    });
+
+    // Product browsing is available to authenticated users.
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{product}', [ProductController::class, 'show']);
 
     // Protected Product Management (Store, Update, Delete)
     Route::post('/products', [ProductController::class, 'store']);
-    
-    // Accept PUT, PATCH, and POST for updates to avoid any method mismatch errors
-    Route::match(['put', 'patch', 'post'], '/products/{product}', [ProductController::class, 'update']);
-    
+
+    Route::match(['put', 'patch'], '/products/{product}', [ProductController::class, 'update']);
+
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 
     // Protected Category Management (Store, Update, Delete)
@@ -63,13 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('reviews', ReviewController::class);
-    
+
     // Nested Resource for Order Products
     Route::apiResource('orders.products', OrderProductController::class);
-});
-
-Route::get('/test', function () {
-    return response()->json([
-        'message' => 'API is working!'
-    ]);
 });

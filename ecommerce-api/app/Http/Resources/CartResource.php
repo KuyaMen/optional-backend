@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class CartResource extends JsonResource
 {
     /**
-     * Transform the resource into an array. 
+     * Transform the resource into an array.
      *
      * @return array<string, mixed>
      */
@@ -19,6 +19,10 @@ class CartResource extends JsonResource
             'user_id' => $this->user_id,
             'product_id' => $this->product_id,
             'quantity' => $this->quantity,
+            'product' => $this->whenLoaded(
+                'product',
+                fn () => new ProductResource($this->product)
+            ),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
